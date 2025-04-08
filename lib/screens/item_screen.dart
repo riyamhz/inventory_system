@@ -19,6 +19,7 @@ class _ItemScreenState extends State<ItemScreen> {
   TextEditingController quantityController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  Key streamKey = UniqueKey();
 
   Future<void> addItem({
     required String name,
@@ -77,6 +78,24 @@ class _ItemScreenState extends State<ItemScreen> {
       key: formKey,
       child: Scaffold(
         backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: const Text("Inventory Items"),
+          actions: [
+            ElevatedButton.icon(
+              onPressed: () {
+                setState(() {
+                  productNameController.clear();
+                  quantityController.clear();
+                  priceController.clear();
+                  docId = null;
+                  streamKey = UniqueKey();
+                });
+              },
+              label: const Text("Refresh"),
+              icon: const Icon(Icons.refresh_rounded),
+            ),
+          ],
+        ),
         body: SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
@@ -159,6 +178,7 @@ class _ItemScreenState extends State<ItemScreen> {
                 height: 20,
               ),
               StreamBuilder<QuerySnapshot>(
+                key: streamKey,
                 stream: FirebaseFirestore.instance
                     .collection('inventory')
                     .snapshots(),
